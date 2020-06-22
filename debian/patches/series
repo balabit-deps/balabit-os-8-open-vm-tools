@@ -1,0 +1,4 @@
+debian/pam-use-common-auth-account
+debian/max_nic_count
+debian/scsi-udev-rule
+fix-FTBFS-glibc2.32.patch
