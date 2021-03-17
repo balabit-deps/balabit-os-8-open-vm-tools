@@ -1,5 +1,5 @@
 /*********************************************************
- * Copyright (C) 2008-2019 VMware, Inc. All rights reserved.
+ * Copyright (C) 2008-2020 VMware, Inc. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -44,11 +44,21 @@
 #include "vmware/tools/log.h"
 #include "vmware/tools/utils.h"
 #include "vmware/tools/vmbackup.h"
+
 #if defined(_WIN32)
+#include "vmware/tools/guestStore.h"
+#endif
+
+#if defined(_WIN32)
+#  include "codeset.h"
+#  include "guestStoreClient.h"
+#  include "globalConfig.h"
+#  include "toolsNotify.h"
 #  include "windowsu.h"
 #else
 #  include "posix.h"
 #endif
+
 
 /*
  * Establish the default and maximum vmusr RPC channel error limits
@@ -76,6 +86,13 @@
 
 #define CONFNAME_MAX_CHANNEL_ATTEMPTS "maxChannelAttempts"
 
+#if defined(_WIN32)
+/*
+ * The state of the global conf module.
+ */
+static gboolean gGlobalConfEnabled = FALSE;
+#endif
+
 
 /*
  ******************************************************************************
@@ -92,6 +109,16 @@
 static void
 ToolsCoreCleanup(ToolsServiceState *state)
 {
+#if defined(_WIN32)
+   if (state->mainService) {
+      /*
+       * Shut down guestStore plugin first to prevent worker threads from being
+       * blocked in client lib synchronous recv() call.
+       */
+      ToolsPluginSvcGuestStore_Shutdown(&state->ctx);
+   }
+#endif
+
    ToolsCorePool_Shutdown(&state->ctx);
    ToolsCore_UnloadPlugins(state);
 #if defined(__linux__)
@@ -99,6 +126,16 @@ ToolsCoreCleanup(ToolsServiceState *state)
       ToolsCore_ReleaseVsockFamily(state);
    }
 #endif
+
+#if defined(_WIN32)
+   if (state->mainService && GuestStoreClient_DeInit()) {
+      g_info("%s: De-initialized GuestStore client.\n", __FUNCTION__);
+   }
+   if (state->mainService && ToolsNotify_End()) {
+      g_info("%s: End Tools notifications.\n", __FUNCTION__);
+   }
+#endif
+
    if (state->ctx.rpc != NULL) {
       RpcChannel_Stop(state->ctx.rpc);
       RpcChannel_Destroy(state->ctx.rpc);
@@ -397,6 +434,12 @@ ToolsCoreRunLoop(ToolsServiceState *state)
       ToolsCoreReportVersionData(state);
    }
 
+#if defined(_WIN32)
+   if (state->mainService && GuestStoreClient_Init()) {
+      g_info("%s: Initialized GuestStore client.\n", __FUNCTION__);
+   }
+#endif
+
    if (!ToolsCore_LoadPlugins(state)) {
       return 1;
    }
@@ -465,9 +508,27 @@ ToolsCoreRunLoop(ToolsServiceState *state)
       /*
        * For now exclude the MAC due to limited testing.
        */
-      if (state->mainService && ToolsCoreHangDetector_Start(&state->ctx)) {
-         g_info("Successfully started tools hang detector");
+      if (state->mainService) {
+         if (ToolsCoreHangDetector_Start(&state->ctx)) {
+            g_info("%s: Successfully started tools hang detector",
+                   __FUNCTION__);
+         }
+#if defined(_WIN32)
+         if (ToolsNotify_Start(&state->ctx)) {
+            g_info("%s: Successfully started tools notifications",
+                   __FUNCTION__);
+         }
+#endif
       }
+
+#if defined(_WIN32)
+      if (GlobalConfig_Start(&state->ctx)) {
+         g_info("%s: Successfully started global config module.",
+                  __FUNCTION__);
+         gGlobalConfEnabled = TRUE;
+      }
+#endif
+
       g_main_loop_run(state->ctx.mainLoop);
 #endif
    }
@@ -609,10 +670,35 @@ ToolsCore_ReloadConfig(ToolsServiceState *state,
    gboolean first = state->ctx.config == NULL;
    gboolean loaded;
 
+#if defined(_WIN32)
+   gboolean globalConfLoaded = FALSE;
+
+   if (gGlobalConfEnabled) {
+      globalConfLoaded =  GlobalConfig_LoadConfig(&state->globalConfig,
+                                                  &state->globalConfigMtime);
+      if (globalConfLoaded) {
+         /*
+         * Set the configMtime to 0 so that the config file from the file system
+         * is reloaded. Else, the config is loaded only if it's been modified
+         * since the last check.
+         */
+         state->configMtime = 0;
+      }
+   }
+#endif
+
    loaded = VMTools_LoadConfig(state->configFile,
                                G_KEY_FILE_NONE,
                                &state->ctx.config,
                                &state->configMtime);
+
+#if defined(_WIN32)
+   if (loaded || globalConfLoaded) {
+      gboolean configUpdated = VMTools_AddConfig(state->globalConfig,
+                                                 state->ctx.config);
+      loaded = loaded || configUpdated;
+   }
+#endif
 
    if (!first && loaded) {
       g_debug("Config file reloaded.\n");
@@ -676,6 +762,98 @@ ToolCoreGetLastErrorMsg(DWORD error)
    return msg;
 }
 
+
+/**
+ * Check the version for a file using GetFileVersionInfo method
+ *
+ * @param[in]  pluginPath        plugin path name.
+ * @param[in]  checkBuildNumber  inlcude check for build number.
+ *
+ * @return TRUE if plugin version matches the tools version,
+ *         FALSE in case of a mismatch.
+ */
+
+gboolean
+ToolsCore_CheckModuleVersion(const gchar *pluginPath,
+                             gboolean checkBuildNumber)
+{
+   WCHAR *pluginPathW = NULL;
+   void *buffer = NULL;
+   DWORD bufferLen = 0;
+   DWORD dummy = 0;
+   VS_FIXEDFILEINFO *fixedFileInfo = NULL;
+   UINT fixedFileInfoLen = 0;
+   ToolsVersionComponents toolsVer = {0};
+   uint32 pluginVersion[4] = {0};
+   gboolean result = FALSE;
+   static const uint32 toolsBuildNumber = PRODUCT_BUILD_NUMBER_NUMERIC;
+
+   if (!CodeSet_Utf8ToUtf16le(pluginPath,
+                              strlen(pluginPath),
+                              (char **)&pluginPathW,
+                              NULL)) {
+      g_debug("%s: Could not convert file %s to UTF-16\n",
+              __FUNCTION__, pluginPath);
+      goto exit;
+   }
+
+   bufferLen = GetFileVersionInfoSizeW(pluginPathW, &dummy);
+   if (bufferLen == 0) {
+      g_debug("%s: Failed to get info size from %s %u",
+              __FUNCTION__, pluginPath, GetLastError());
+      goto exit;
+   }
+
+   buffer = g_malloc(bufferLen);
+   if (!buffer) {
+      g_debug("%s: malloc failed for %s", __FUNCTION__, pluginPath);
+      goto exit;
+   }
+
+   if (!GetFileVersionInfoW(pluginPathW, 0, bufferLen, buffer)) {
+      g_debug("%s: Failed to get info size from %s %u",
+              __FUNCTION__, pluginPath, GetLastError());
+      goto exit;
+   }
+
+   if (!VerQueryValueW(buffer, L"\\", (void **)&fixedFileInfo, &fixedFileInfoLen)) {
+      g_debug("%s: Failed to get fixed file info from %s %u",
+              __FUNCTION__, pluginPath, GetLastError());
+      goto exit;
+   }
+
+   if (fixedFileInfoLen < sizeof *fixedFileInfo) {
+      g_debug("%s: Fixed file info from %s is too short: %d",
+                __FUNCTION__, pluginPath, fixedFileInfoLen);
+      goto exit;
+   }
+
+   /* Using Product version. File version is also available. */
+   pluginVersion[0] = (uint16)(fixedFileInfo->dwProductVersionMS >> 16);
+   pluginVersion[1] = (uint16)(fixedFileInfo->dwProductVersionMS >>  0);
+   pluginVersion[2] = (uint16)(fixedFileInfo->dwProductVersionLS >> 16);
+   pluginVersion[3] = (uint16)(fixedFileInfo->dwProductVersionLS >>  0);
+
+   TOOLS_VERSION_UINT_TO_COMPONENTS(TOOLS_VERSION_CURRENT, &toolsVer);
+
+   result = (pluginVersion[0] == toolsVer.major &&
+             pluginVersion[1] == toolsVer.minor &&
+             pluginVersion[2] == toolsVer.base);
+
+   if (result && checkBuildNumber) {
+      result =  pluginVersion[3] == toolsBuildNumber;
+   }
+
+exit:
+   if (!result) {
+      g_warning("%s: Failed or no version check %s : %u.%u.%u.%u",
+                __FUNCTION__, pluginPath, pluginVersion[0], pluginVersion[1],
+                pluginVersion[2], pluginVersion[3]);
+   }
+   g_free(buffer);
+   free(pluginPathW);
+   return result;
+}
 #endif
 
 
@@ -1003,6 +1181,8 @@ ToolsCore_Setup(ToolsServiceState *state)
 
    g_type_init();
    state->ctx.serviceObj = g_object_new(TOOLSCORE_TYPE_SERVICE, NULL);
+   state->ctx.registerServiceProperty =
+      (RegisterServiceProperty)ToolsCoreService_RegisterProperty;
 
    /* Register the core properties. */
    ToolsCoreService_RegisterProperty(state->ctx.serviceObj,

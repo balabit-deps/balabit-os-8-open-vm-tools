@@ -1,18 +1,53 @@
-open-vm-tools (2:11.1.5-1~ubuntu20.04.2) focal; urgency=medium
+open-vm-tools (2:11.2.5-2ubuntu1~ubuntu20.04.1) focal; urgency=medium
 
-  * Update to latest release v11.1.5 (LP: #1892266)
+  * Update to latest release v11.2.5 (LP: #1911831)
     - Revert "Add net-tools as dependency again." as we don't want to
       modify the focal seed/ISO content without a real issue behind it.
+    - Revert "build-depend on libgdk-pixbuf-xlib-2.0-dev"
 
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Mon, 22 Jun 2020 08:40:58 +0200
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Wed, 17 Mar 2021 08:14:50 +0100
 
-open-vm-tools (2:11.1.5-1ubuntu1) groovy; urgency=medium
+open-vm-tools (2:11.2.5-2ubuntu1) hirsute; urgency=medium
 
-  * d/p/fix-FTBFS-glibc2.32.patch: fix tirpc flags to propagate correctly
-    fixing an FTFBS with glibc >=2.32
-  * d/rules: avoid FTBFS by ignoring nonnull errors for now
+  * d/p/fix-FTFBS-glib2.0-2.66.3.patch: fix FTBFS with glib2.0 >=2.66.3
 
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Tue, 29 Sep 2020 13:37:20 +0200
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Mon, 08 Mar 2021 12:12:35 +0100
+
+open-vm-tools (2:11.2.5-2) unstable; urgency=medium
+
+  * [7f14954] Drop max_nic_count patch.
+    See https://github.com/vmware/open-vm-tools/issues/128 for details.
+
+ -- Bernd Zeimetz <bzed@debian.org>  Thu, 25 Feb 2021 17:49:11 +0100
+
+open-vm-tools (2:11.2.5-1) unstable; urgency=medium
+
+  * [b54d022] New upstream version 11.2.5
+    Thanks: John Wolfe
+    Closes: #980190
+
+ -- Bernd Zeimetz <bzed@debian.org>  Fri, 15 Jan 2021 22:30:08 +0100
+
+open-vm-tools (2:11.2.0-2) unstable; urgency=medium
+
+  * [d5d4593] Fix building with new gcc versions
+  * [94ce968] build-depend on libgdk-pixbuf-xlib-2.0-dev
+    Closes: #978262
+    Thanks to Lucas NUssbaum for the upload reminder.
+
+ -- Bernd Zeimetz <bzed@debian.org>  Sun, 27 Dec 2020 00:01:29 +0100
+
+open-vm-tools (2:11.2.0-1) unstable; urgency=medium
+
+  * [447d833] Update upstream source from tag 'upstream/11.2.0'
+    Update to upstream version '11.2.0'
+    with Debian dir 67243748d9ba09fc4e53f1ab4e921e119c981beb
+    Closes: #972732
+  * [704edba] remove pam-use-common-auth-account patch.
+    Not needed anymore
+  * [f792922] Use upstream pam file for Debian
+
+ -- Bernd Zeimetz <bzed@debian.org>  Sun, 25 Oct 2020 19:33:02 +0100
 
 open-vm-tools (2:11.1.5-1) unstable; urgency=medium
 

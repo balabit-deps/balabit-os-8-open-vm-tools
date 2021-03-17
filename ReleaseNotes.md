@@ -1,8 +1,8 @@
-#open-vm-tools 11.1.5 Release Notes
+     Open-vm-tools 11.2.5 Release Notes
 
-**Updated on: 18 AUG 2020**
+**Updated on: 12 JAN 2021**
 
-Open-vm-tools | 18 AUG 2020 | Build 16724464
+Open-vm-tools | 12 JAN 2021 | Build 17337674
 
 Check for additions and updates to these release notes.
 
@@ -12,6 +12,7 @@ What's in the Release Notes
 The release notes cover the following topics:
 
 *   [What's New](#whatsnew)
+*   [Internationalization](#i18n)
 *   [End of Feature Support Notice](#endoffeaturesupport)
 *   [Guest Operating System Customization Support](#guestop)
 *   [Interoperability Matrix](#interop)
@@ -21,12 +22,27 @@ The release notes cover the following topics:
 What's New
 ----------
 
-*   For issues fixed in this version, refer to [Resolved Issues](#resolvedissues) section.
+*   Fixed issues mentioned in [Resolved Issues](#resolvedissues) section.
+
+Internationalization
+--------------------
+
+Open-vm-tools 11.2.5 is available in the following languages:
+
+*   English
+*   French
+*   German
+*   Spanish
+*   Italian
+*   Japanese
+*   Korean
+*   Simplified Chinese
+*   Traditional Chinese
 
 End of Feature Support Notice
 -----------------------------
 
-*   The tar tools (linux.iso) and OSPs shipped with VMware Tools 10.3.x release will continue to be supported. However, releases after VMware Tools 10.3.5 will only include critical and security fixes; there will be no new feature support in these types of VMware Tools (tar tools and OSP's). It is recommended that customers use open-vm-tools for those operating systems that support open-vm-tools. For more information about different types of VMware Tools, see [https://blogs.vmware.com/vsphere/2016/02/understanding-the-three-types-of-vm-tools.html](https://blogs.vmware.com/vsphere/2016/02/understanding-the-three-types-of-vm-tools.html)
+*   The tar tools (linux.iso) and OSPs shipped with VMware Tools 10.3.x release will continue to be supported. However, releases after VMware Tools 10.3.5 will only include critical and security fixes and no new feature support in these types of VMware Tools (tar tools and OSP's). It is recommended that customers use open-vm-tools for those operating systems that support open-vm-tools. For more information on different types of VMware Tools, see [https://blogs.vmware.com/vsphere/2016/02/understanding-the-three-types-of-vm-tools.html](https://blogs.vmware.com/vsphere/2016/02/understanding-the-three-types-of-vm-tools.html)
 
 Guest Operating System Customization Support
 --------------------------------------------
@@ -41,28 +57,34 @@ The [VMware Product Interoperability Matrix](http://partnerweb.vmware.com/comp_g
 Resolved Issues
 ---------------
 
-*   **In open-vm-tools, the sdmp-plugin scripts are updated to use the 'ss' command instead of the 'netstat' command to get inter-service communication information.**
-    
-    The 'netstat' command is deprecated and is unavailable in some new releases of Linux VMs. The credential-less service discovery feature by the vRealize Operations Manager product cannot be used in such VMs. To avoid this issue, the sdmp-plugin scripts are now updated to use the 'ss' command instead of the 'netstat' command.
-    
+*   **The SUSE specific vmtoolsd PAM configuration file incorrectly referenced pam_securetty.so.**
+
     This issue is fixed in this release.
 
-*   **The following issues reported on https://github.com/vmware/open-vm-tools/issues have been addressed:**
+*   **The following issues and pull requests reported on https://github.com/vmware/open-vm-tools have been addressed:**
 
-        https://github.com/vmware/open-vm-tools/issues/451
-        https://github.com/vmware/open-vm-tools/issues/429
-        https://github.com/vmware/open-vm-tools/issues/428
+        https://github.com/vmware/open-vm-tools/issues/467
+        https://github.com/vmware/open-vm-tools/issues/468
+        https://github.com/vmware/open-vm-tools/pull/469
 
-    These issues are fixed in this release.
+*   **A number of Coverity reported errors and false positives have been addressed.**
+
+*   **A complete list of the granular changes that are in the open-vm-tools 11.2.5 release is available at:**
+
+        https://github.com/vmware/open-vm-tools/blob/stable-11.2.5/open-vm-tools/ChangeLog
+
 
 Known Issues
 ------------
+
+The known issues are grouped as follows.
+
 
 **Open-vm-tools Issues in VMware Workstation or Fusion**
 
 *   **Shared Folders mount is unavailable on Linux VM.**
     
-    If the **Shared Folders** feature is enabled on a Linux VM while it is powered off, the shared folders mount is not available on restart.
+    If the **Shared Folders** feature is enabled on a Linux VM while it is powered off, shared folders mount is not available on restart.
     
     Note: This issue is applicable for open-vm-tools running on Workstation and Fusion.
     
@@ -75,7 +97,7 @@ Known Issues
     
 *   **Drag functionality fails to work in Ubuntu.**
     
-    Drag functionality fails to work in Ubuntu 16.04.4 32-bit virtual machine installed using easy install. Also, failure of copy and paste functionality is observed in the same system.
+    Drag functionality fails to work in Ubuntu 16.04.4 32-bit virtual machine installed using easy install. Also, failure of copy and paste functionality is observed in the same systems.
     
     Note: This issue is applicable for open-vm-tools running on Workstation and Fusion.
     

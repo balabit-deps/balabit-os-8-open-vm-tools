@@ -27,8 +27,6 @@
 #ifndef __CONF_H__
 #define __CONF_H__
 
-#include "guestApp.h"
-
 #define CONF_FILE         "tools.conf"
 
 #if ! defined(_WIN32)
@@ -53,6 +51,7 @@
 #define CONFNAME_DISABLETOOLSVERSION      "disable-tools-version"
 #define CONFNAME_HIDETOOLSVERSION         "hide-tools-version"
 #define CONFNAME_DISABLEPMTIMERWARNING    "disable-pmtimerwarning"
+#define CONFGROUPNAME_VMTOOLS             "vmtools"
 
 /*
  ******************************************************************************
@@ -129,24 +128,15 @@
  */
 
 /*
-******************************************************************************
-* BEGIN GuestStore upgrader goodies.
-*/
+ ******************************************************************************
+ * BEGIN GuestStore upgrader goodies.
+ ******************************************************************************
+ */
 
 /**
  * Defines the string used for the GuestStore upgrade config file group.
  */
-#define CONFGROUPNAME_GUESTSTOREUPGRADE "guestStoreUpgrade"
-
-/**
- * Define a custom GuestStore Upgrade poll interval (in seconds).
- *
- * @note Illegal values result in a @c g_warning and fallback to the default
- * poll interval.
- *
- * @param int   User-defined poll interval.  Set to 0 to disable polling.
- */
-#define CONFNAME_GUESTSTOREUPGRADE_POLLINTERVAL "poll-interval"
+#define CONFGROUPNAME_GSUPGRADE "gueststoreupgrade"
 
 /**
  * Defines the value for GuestStore upgrade feature to be enabled or not.
@@ -154,37 +144,65 @@
  * @note Illegal values result in a @c g_warning and fallback to the default
  * value.
  *
- * @param boolean Set to TRUE to disable publishing.
- *                Set to FALSE to enable publishing.
+ * @param string  Set to "off" no tools upgrade from GuestStore.
+ *                Set to "manual" tools upgrade from GuestStore manual start.
+ *                Set to "immediate" tools upgrade from GuestStore start
+ *                autoCONFNAME_GSUPGRADE_RESOURCEmatically checking on the poll-interval frequency.
+ *                Set to "powercycle" tools upgrade from GuestStore on system
+ *                power on.
  */
-#define CONFNAME_GUESTSTOREUPGRADE_DISABLED "disabled"
+#define CONFNAME_GSUPGRADE_POLICY "policy"
 
 /**
- * Defines the value for GuestStore upgrade to upgrade or not.
+ * Define a custom GuestStore check poll interval (in seconds).
  *
  * @note Illegal values result in a @c g_warning and fallback to the default
- * value.
+ * poll interval.
  *
- * @param boolean Set to TRUE to disable publishing.
- *                Set to FALSE to enable publishing.
+ * @param int   User-defined poll interval.  Set to 0 to disable polling.
  */
-#define CONFNAME_GUESTSTOREUPGRADE_ALLOW_UPGRADE "allow-upgrade"
+#define CONFNAME_GSUPGRADE_POLLINTERVAL "poll-interval"
 
 /**
- * Defines the value for GuestStore upgrade to add or remove features or not.
+ * Define a custom GuestStore periodic Upgrade interval (in seconds).
  *
  * @note Illegal values result in a @c g_warning and fallback to the default
- * value.
+ * upgrade interval.
  *
- * @param boolean Set to TRUE to disable publishing.
- *                Set to FALSE to enable publishing.
+ * @param int   User-defined upgrade interval.  Set to 0 to disable polling.
  */
-#define CONFNAME_GUESTSTOREUPGRADE_ALLOW_ADDREMOVE_FEATURE "allow-addremove-feature"
+#define CONFNAME_GSUPGRADE_UPGRADEINTERVAL "upgrade-interval"
+
+/**
+ * Define a custom GuestStore content path prefix.
+ *
+ * @note Illegal values result in a @c g_warning and fallback to the default
+ * resource path.
+ *
+ * @param string  User-defined GuestStore resource path.
+ */
+#define CONFNAME_GSUPGRADE_RESOURCE "resource"
+
+/**
+ * Define a custom GuestStore content vmtools key.
+ *
+ * @note Illegal values result in a @c g_warning and fallback to the default
+ * vmtools key.
+ *
+ * @param string  User-defined GuestStore vmtools key.
+ *                Set to "vmtools" for the latest version.
+ *                Suggested examples for earlier versions are:
+ *                Set to "vmtools-11.0.0" for "vmtools-11.0.0/"
+ *                Set to "vmtools-11.1.0" for "vmtools-11.1.0/"
+ *                Set to "vmtools-11.2.0" for "vmtools-11.2.0/"
+ *                Set to "vmtools-11.3.0" for "vmtools-11.3.0/"
+ */
+#define CONFNAME_GSUPGRADE_VMTOOLS_VERSION "vmtools-version-key"
 
 /*
-* END GuestStore upgrader goodies.
-******************************************************************************
-*/
+ * END GuestStore upgrader goodies.
+ ******************************************************************************
+ */
 
 
 /*
@@ -495,4 +513,23 @@
  ******************************************************************************
  */
 
+/*
+ ******************************************************************************
+ * BEGIN CarbonBlack helper plugin goodies.
+ */
+
+/**
+ * Define the string used for cbhelper config file group
+ */
+#define CONFGROUPNAME_CBHELPER "cbhelper"
+
+/**
+ * Defines user-defined polling interval in seconds.
+ */
+#define CONFNAME_CBHELPER_POLLINTERVAL "poll-interval"
+
+/*
+ ******************************************************************************
+ * END CarbonBlack helper plugin goodies.
+ */
 #endif /* __CONF_H__ */

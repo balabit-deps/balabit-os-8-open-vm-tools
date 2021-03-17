@@ -1,5 +1,5 @@
 /*********************************************************
- * Copyright (C) 2007-2019 VMware, Inc. All rights reserved.
+ * Copyright (C) 2007-2020 VMware, Inc. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -48,6 +48,7 @@
 #endif
 #include "vmware/tools/utils.h"
 #include "vmware/tools/vmbackup.h"
+#include "vmware/tools/log.h"
 #include "xdrutil.h"
 
 #if !defined(__APPLE__)
@@ -285,7 +286,7 @@ VmBackup_SendEventNoAbort(const char *event,
                                NULL);
    } else {
       g_warning("Failed to send vmbackup event: %s, result: %s.\n",
-                msg, result);
+                msg, VM_SAFE_STR(result));
    }
    vm_free(result);
    g_free(msg);
@@ -489,7 +490,7 @@ VmBackupDoAbort(void)
 
    if (gBackupState->machineState != VMBACKUP_MSTATE_SCRIPT_ERROR &&
        gBackupState->machineState != VMBACKUP_MSTATE_SYNC_ERROR) {
-      const char *eventMsg = "Quiesce aborted.";
+      const char *eventMsg = "Quiesce canceled.";
       /* Mark the current operation as cancelled. */
       g_mutex_lock(&gBackupState->opLock);
       if (gBackupState->currentOp != NULL) {
@@ -502,12 +503,12 @@ VmBackupDoAbort(void)
 #ifdef __linux__
       /* If quiescing has been completed, then undo it.  */
       if (gBackupState->machineState == VMBACKUP_MSTATE_SYNC_FREEZE) {
-         g_debug("Aborting with file system already quiesced, undo quiescing "
+         g_debug("Canceling with file system already quiesced, undo quiescing "
                  "operation.\n");
          if (!gBackupState->provider->undo(gBackupState,
                                       gBackupState->provider->clientData)) {
             g_debug("Quiescing undo failed.\n");
-            eventMsg = "Quiesce could not be aborted.";
+            eventMsg = "Quiesce could not be canceled.";
          }
       }
 #endif
@@ -536,7 +537,7 @@ static gboolean
 VmBackupAbortTimer(gpointer data)
 {
    ASSERT(gBackupState != NULL);
-   g_warning("Aborting backup operation due to timeout.");
+   g_warning("Canceling backup operation due to timeout.");
    g_source_unref(gBackupState->abortTimer);
    gBackupState->abortTimer = NULL;
    VmBackupDoAbort();
@@ -677,7 +678,7 @@ VmBackupAsyncCallback(void *clientData)
        * sending backup event to the host.
        */
       if (gBackupState->rpcState == VMBACKUP_RPC_STATE_ERROR) {
-         g_warning("Aborting backup operation due to RPC errors.");
+         g_warning("Canceling backup operation due to RPC errors.");
          VmBackupDoAbort();
 
          /*
