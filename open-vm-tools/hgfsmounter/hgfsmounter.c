@@ -1,5 +1,5 @@
 /*********************************************************
- * Copyright (C) 2006-2019 VMware, Inc. All rights reserved.
+ * Copyright (C) 2006-2020 VMware, Inc. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -224,7 +224,7 @@ GetPathMax(const char *path) // IN: path to check
 /*
  *-----------------------------------------------------------------------------
  *
- * IsValidShareName
+ * ParseShareName
  *
  *    A helper function to parse the share name from "host:share" format into
  *    two separate strings, reporting errors if any.
@@ -1121,7 +1121,7 @@ main(int argc,          // IN
    canonicalizedPath = malloc(pathMax * sizeof *canonicalizedPath);
    if (canonicalizedPath == NULL) {
       printf("Error: cannot allocate memory for canonicalized path, "
-             "aborting mount\n");
+             "canceling mount\n");
       goto out;
    } else if (!realpath(mountPoint, canonicalizedPath)) {
       perror("Error: cannot canonicalize mount point");
@@ -1130,7 +1130,7 @@ main(int argc,          // IN
    mountPoint = canonicalizedPath;
 
    if (!ParseShareName(shareName, &shareNameHost, &shareNameDir)) {
-      printf("Error: share name is invalid, aborting mount\n");
+      printf("Error: share name is invalid, canceling mount\n");
       goto out;
    }
 

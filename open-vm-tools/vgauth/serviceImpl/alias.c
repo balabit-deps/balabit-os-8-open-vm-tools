@@ -1,5 +1,5 @@
 /*********************************************************
- * Copyright (C) 2011-2019 VMware, Inc. All rights reserved.
+ * Copyright (C) 2011-2020 VMware, Inc. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -845,9 +845,8 @@ done:
       *contents = buf;
       *fileSize = lstatBuf.st_size;
    }
-   if (fd >= 0) {
-      close(fd);
-   }
+
+   close(fd);
 
    return err;
 }
@@ -3159,6 +3158,9 @@ ServiceIDVerifyStoreContents(void)
              * a blacklist of bad files and keep going.  but that's
              * a lot of risky work that's very hard to test, so punt for now.
              */
+            g_free(badFileName);
+            g_free(fullFileName);
+            g_dir_close(dir);
             return VGAUTH_E_FAIL;
          } else {
             Audit_Event(TRUE,
@@ -3409,6 +3411,7 @@ ServiceAliasInitAliasStore(void)
                          "Failed to rename suspect Alias store directory '%s' to '%s'"),
                      aliasStoreRootDir, badRootDirName);
          // XXX making this fatal for now.  can we do anything better?
+         g_free(badRootDirName);
          return VGAUTH_E_FAIL;
       }
       g_free(badRootDirName);
