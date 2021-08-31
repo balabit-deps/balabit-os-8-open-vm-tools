@@ -1,17 +1,55 @@
-open-vm-tools (2:11.2.5-2ubuntu1~ubuntu20.04.1) focal; urgency=medium
+open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.1) focal; urgency=medium
 
-  * Update to latest release v11.2.5 (LP: #1911831)
+  * Update to latest release v11.3.0 (LP: #1933143)
+    Remaining changes:
+    - Revert "build-depend on libgdk-pixbuf-xlib-2.0-dev"
+  * Dropped [ is in 11.3.0-2]
     - Revert "Add net-tools as dependency again." as we don't want to
       modify the focal seed/ISO content without a real issue behind it.
-    - Revert "build-depend on libgdk-pixbuf-xlib-2.0-dev"
 
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Wed, 17 Mar 2021 08:14:50 +0100
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Tue, 31 Aug 2021 12:05:31 +0200
 
-open-vm-tools (2:11.2.5-2ubuntu1) hirsute; urgency=medium
+open-vm-tools (2:11.3.0-2) experimental; urgency=medium
 
-  * d/p/fix-FTFBS-glib2.0-2.66.3.patch: fix FTBFS with glib2.0 >=2.66.3
+  * d/copyright: further fix licenses after consulting SPDX
+  * d/copyright: state multi-license under one glob pattern
+  * d/control: enable arm64 which is ready in 11.3.0
+  * d/control: drop no more needed net-tools dependency
 
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Mon, 08 Mar 2021 12:12:35 +0100
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Wed, 18 Aug 2021 08:27:46 +0200
+
+open-vm-tools (2:11.3.0-1) experimental; urgency=medium
+
+  * New upstream version 11.3.0 (Closes: #990163)(LP: #1933143)
+    - d/rules: install new binary vmwgfxctrl into open-vm-tools-desktop
+    - d/rules: add new binary vmware-alias-import to open-vm-tools
+    - d/rules: add new vmsvc plugins libguestStore.so and libgdp.so
+      to open-vm-tools
+  * d/open-vm-tools.maintscript: remove stale conffiles (Closes: #868273)
+  * d/control: add myself to uploaders
+  * Cleanups flagged by tracker.debian.org
+    - d/watch: fix to work with upstreams github tags
+    - d/control: bump Standards-Version to 4.5.1 (no changes needed)
+  * Cleanups for various Lintian findings
+    - d/source/lintian-overrides: allow helper scripts by setting
+      patch-file-present-but-not-mentioned-in-series
+    - d/{open-vm-tools,open-vm-tools-dev}.lintian-overrides tolerate
+      package-name-doesnt-match-sonames
+    - d/{open-vm-tools,open-vm-tools-desktop}.lintian-overrides: tolerate
+      no-manual-page until upstream issue 526 is resolved
+    - d/control: fix skip-systemd-native-flag-missing-pre-depends warning by
+      adding misc:Pre-Depends
+    - d/copyright: rename non allowed license names to fix
+      space-in-std-shortname-in-dep5-copyright warning
+    - d/open-vm-tools-desktop.lintian-overrides: fix setuid override
+    - d/rules: drop no more needed handling of pam vmtoolsd-x64
+    - d/rules: put libs and .pc files in correct multiarch directories
+    - d/rules: do not ship vmware-vgauth-smoketest (only meant for build&test,
+      per upstream it can wipe system config and therefore should not be
+      shipped after build - upstream issue 527)
+  * d/control: Remove constraints unnecessary since stretch (from Janitor)
+
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Tue, 06 Jul 2021 12:32:16 +0200
 
 open-vm-tools (2:11.2.5-2) unstable; urgency=medium
 

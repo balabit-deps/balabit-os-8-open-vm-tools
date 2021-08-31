@@ -1,3 +1,2 @@
 use-debian-pam
 debian/scsi-udev-rule
-fix-FTFBS-glib2.0-2.66.3.patch
