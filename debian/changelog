@@ -1,3 +1,12 @@
+open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.2) focal; urgency=medium
+
+  * d/rules: provide a compat link for the old open-vm-tools
+    library/plugin paths (LP: #1944946)
+    - d/open-vm-tools.postinst: handle upgrades from <11.3.0-2 in regard
+      to the symlink
+
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Tue, 12 Oct 2021 07:53:54 +0200
+
 open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.1) focal; urgency=medium
 
   * Update to latest release v11.3.0 (LP: #1933143)

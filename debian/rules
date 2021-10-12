@@ -85,6 +85,9 @@ override_dh_auto_install:
 	mv debian/open-vm-tools/usr/lib/$(DEB_HOST_MULTIARCH)/open-vm-tools/serviceDiscovery/scripts/* debian/open-vm-tools-sdmp/usr/lib/$(DEB_HOST_MULTIARCH)/open-vm-tools/serviceDiscovery/scripts/
 	rm -rf debian/open-vm-tools/usr/lib/$(DEB_HOST_MULTIARCH)/open-vm-tools/serviceDiscovery/
 
+	# Compat link for LP: #1944946 due to software checking the old non multiarch .so paths
+	ln --relative --symbolic debian/open-vm-tools/usr/lib/$(DEB_HOST_MULTIARCH)/open-vm-tools debian/open-vm-tools/usr/lib/open-vm-tools
+
 override_dh_gencontrol:
 	if [ "${VENDOR}" = "UBUNTU" ]; \
 	then \
