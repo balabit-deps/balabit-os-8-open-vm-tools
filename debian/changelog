@@ -1,3 +1,12 @@
+open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.3) focal-security; urgency=medium
+
+  * SECURITY UPDATE: local privilege escalation
+    - debian/patches/CVE-2022-31676.patch: check authorization on incoming
+      guestOps requests in open-vm-tools/vgauth/serviceImpl/proto.c.
+    - CVE-2022-31676
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 16 Aug 2022 09:23:06 -0400
+
 open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.2) focal; urgency=medium
 
   * d/rules: provide a compat link for the old open-vm-tools
