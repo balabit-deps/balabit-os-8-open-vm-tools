@@ -1,3 +1,11 @@
+open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.4) focal; urgency=medium
+
+  * d/open-vm-tools.postinst: Fixes issue with "udevadm trigger"
+    affecting all devices that can cause unwanted side-effects.
+    (LP: #1968354)
+
+ -- Bryce Harrington <bryce@canonical.com>  Mon, 19 Sep 2022 22:14:14 +0000
+
 open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.3) focal-security; urgency=medium
 
   * SECURITY UPDATE: local privilege escalation
