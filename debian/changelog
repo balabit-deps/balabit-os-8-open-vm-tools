@@ -1,3 +1,11 @@
+open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.5) focal-security; urgency=medium
+
+  * SECURITY UPDATE: authentication bypass vulnerability
+    - debian/patches/CVE-2023-20867.patch: Remove some dead code
+    - CVE-2023-20867 
+
+ -- Nishit Majithia <nishit.majithia@canonical.com>  Tue, 25 Jul 2023 09:36:54 +0530
+
 open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.4) focal; urgency=medium
 
   * d/open-vm-tools.postinst: Fixes issue with "udevadm trigger"
