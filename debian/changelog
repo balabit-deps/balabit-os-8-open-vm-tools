@@ -1,3 +1,13 @@
+open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.6) focal-security; urgency=medium
+
+  * SECURITY UPDATE: SAML token signature bypass vulnerability
+    - debian/patches/CVE-2023-20900.patch: Allow only X509 certs to verify
+      the SAML token signature in
+      open-vm-tools/vgauth/serviceImpl/saml-xmlsec1.c.
+    - CVE-2023-20900
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Mon, 11 Sep 2023 14:46:25 -0400
+
 open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.5) focal-security; urgency=medium
 
   * SECURITY UPDATE: authentication bypass vulnerability
