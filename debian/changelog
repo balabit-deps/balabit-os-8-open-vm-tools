@@ -1,3 +1,18 @@
+open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.8) focal-security; urgency=medium
+
+  * SECURITY UPDATE: insecure file handling vulnerability
+    - debian/patches/CVE-2025-22247.patch: properly check symlinks and path
+      traversal chars in open-vm-tools/vgauth/common/VGAuthUtil.c,
+      open-vm-tools/vgauth/common/VGAuthUtil.h,
+      open-vm-tools/vgauth/common/prefs.h,
+      open-vm-tools/vgauth/common/usercheck.c,
+      open-vm-tools/vgauth/serviceImpl/alias.c,
+      open-vm-tools/vgauth/serviceImpl/service.c,
+      open-vm-tools/vgauth/serviceImpl/serviceInt.h.
+    - CVE-2025-22247
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 06 May 2025 09:36:15 -0400
+
 open-vm-tools (2:11.3.0-2ubuntu0~ubuntu20.04.7) focal-security; urgency=medium
 
   * SECURITY UPDATE: SAML Bypass
